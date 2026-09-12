@@ -1,5 +1,4 @@
 import pool from "../db/connection.js";
-import type {Request, Response} from "express";
 import bcrypt from "bcrypt";
 
 

@@ -107,7 +107,7 @@ router.get("/:id/progress/stats", authMiddleware, validateId, async (req, res, n
         if (await isUserEnrolledInCourse(userId, id)) {
             const result = await getCourseProgressStats(userId, id);
             const { total_lessons, completed_lessons } = result[0];
-            const completedPercent = Number(completed_lessons) / Number(total_lessons) * 100;
+            const completedPercent = total_lessons === 0 ? 0 : (Number(completed_lessons) / Number(total_lessons)) * 100;
             return res.status(200).json({
                 totalLessons: Number(total_lessons),
                 completedLessons: Number(completed_lessons),

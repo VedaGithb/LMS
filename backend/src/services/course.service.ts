@@ -52,7 +52,7 @@ export async function getCourseWithLessons(id: number) {
                                      'id', l.id,
                                      'title', l.title,
                                      'content', l.content
-                             )
+                             )  ORDER BY l.position ASC
                      ) FILTER (WHERE l.id IS NOT NULL),
                      '[]'::json
              ) AS lessons
@@ -77,7 +77,9 @@ export async function getCourseProgress(userId: number, courseId: number) {
         LEFT JOIN lesson_progress
             ON lessons.id = lesson_progress.lesson_id
             AND lesson_progress.user_id = $1
-        WHERE course_id = $2`,
+        WHERE course_id = $2
+        ORDER BY lessons.position ASC`,
+
         [userId, courseId]
     );
     return result.rows;

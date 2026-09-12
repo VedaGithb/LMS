@@ -3,14 +3,23 @@ import jwt from "jsonwebtoken";
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
-        const token = req.headers.authorization;
-        if (!token) {
-            return res.status(401).json({
-                error: "No token provided",
-            })
+        const authorization = req.headers.authorization;
+
+        if (!authorization) {
+            return res.status(401).json({ error: "No token provided" });
         }
-        const totalToken = token.replace("Bearer ", "");
-        const payload = jwt.verify(totalToken, process.env.JWT_SECRET!);
+
+        if (!authorization.startsWith("Bearer ")) {
+            return res.status(401).json({ error: "Invalid authorization format" });
+        }
+
+        const token = authorization.slice(7);
+
+        if (!token) {
+            return res.status(401).json({ error: "Invalid authorization format" });
+        }
+
+        const payload = jwt.verify(token, process.env.JWT_SECRET!);
         req.user = payload as { userId: number };
         next()
     } catch (error) {
