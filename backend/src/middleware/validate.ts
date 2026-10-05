@@ -9,9 +9,18 @@ export function validate(schema: ZodType) {
             req.body = validate.data;
             return next();
         } else {
-            return res.status(400).send({
-                error: validate.error.issues
-            });
+            const issue = validate.error.issues[0];
+            if (issue && issue.path[0] === "password" && issue.code === "too_small")  {
+                    return res.status(400).send({
+                        code: "PASSWORD_TOO_SHORT",
+                        message: issue.message,
+                    });
+            } else {
+                return res.status(400).send({
+                    message: validate.error.issues[0]!.message,
+                })
+            }
+
         }
     };
 }

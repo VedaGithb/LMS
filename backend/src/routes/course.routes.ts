@@ -1,194 +1,342 @@
 import { Router } from "express";
+
 import {
     createCourse,
     deleteCourse,
     getAllCourses,
     getCourseById,
-    getCourseWithLessons,
+    getMyCourses,
+    getCourseProgress,
+    getCourseProgressStats,
+    isUserEnrolledInCourse,
     updateCourse,
-    getLessonsByCourseId, getMyCourses, getCourseProgress, isUserEnrolledInCourse, getCourseProgressStats
+    type CourseFilters
 } from "../services/course.service.js";
-import {createCourseSchema, updateCourseSchema} from "../schemas/course.schema.js";
-import {validate} from "../middleware/validate.js";
-import {authMiddleware} from "../middleware/auth.middleware.js";
-import {validateId} from "../middleware/validateId.js";
+
+import {
+    createCourseSchema,
+    updateCourseSchema,
+} from "../schemas/course.schema.js";
+
+import {
+    authMiddleware,
+} from "../middleware/auth.middleware.js";
+
+import { validate } from "../middleware/validate.js";
+import { validateId } from "../middleware/validateId.js";
 
 const router = Router();
 
-router.get("/", async (req, res, next) => {
-    try {
-        const result = await getAllCourses();
+router.get(
+    "/",
+    async (req, res, next) => {
+        try {
+            const filters: CourseFilters = {
+                limit:
+                    typeof req.query.limit === "string"
+                        ? Math.min(
+                            Number(req.query.limit) || 50,
+                            100
+                        )
+                        : 50,
+            };
 
-        res.json(result);
-    } catch (error) {
-        next(error);
-    }
-});
+            if (typeof req.query.q === "string") {
+                filters.q = req.query.q;
+            }
 
-router.get("/my", authMiddleware, async (req, res, next) => {
-    try {
-        const userId = req.user.userId;
-        const result = await getMyCourses(userId);
-        res.status(200).json(result);
-    } catch (error) {
-        next(error);
-    }
-})
+            if (typeof req.query.category === "string") {
+                filters.category = req.query.category;
+            }
 
-router.get("/:id/lessons", validateId, async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
-        const course = await getCourseById(id);
+            if (typeof req.query.technology === "string") {
+                filters.technology = req.query.technology;
+            }
 
-        if (!course) {
-            res.status(404).json({
-                message: "Course not found"
-            })
-        } else {
-            const result = await getLessonsByCourseId(id);
-            res.status(200).json(result);
-        }
-    } catch (error) {
-        next(error);
-    }
-});
+            if (typeof req.query.sort === "string") {
+                filters.sort = req.query.sort;
+            }
 
-router.get("/:id/full", validateId, async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
+            const result = await getAllCourses(filters);
 
-        const result = await getCourseWithLessons(id);
-
-        if (!result) {
-            res.status(404).json({
-                message: "Course not found"
-            });
-        } else {
-            res.status(200).json(result);
-        }
-    } catch (error) {
-        next(error);
-    }
-});
-
-router.get("/:id/progress", authMiddleware, validateId, async (req, res, next) => {
-    try {
-        const userId = req.user.userId;
-        const id = Number(req.params.id);
-        const course = await getCourseById(id);
-        if (!course) {
-            return res.status(404).json({
-                message: "Course not found"
-            });
-        }
-        if (await isUserEnrolledInCourse(userId, id)) {
-            const result = await getCourseProgress(userId, id);
             return res.status(200).json(result);
-        } else {
-            res.status(403).json({
-                message: "You don't have access to this course",
-            })
+        } catch (error) {
+            next(error);
         }
-    } catch (error) {
-        next(error);
     }
-})
+);
 
-router.get("/:id/progress/stats", authMiddleware, validateId, async (req, res, next) => {
-    try {
-        const userId = req.user.userId;
-        const id = Number(req.params.id);
-        const course = await getCourseById(id);
-        if (!course) {
-            return res.status(404).json({
-                message: "Course not found"
-            });
+router.get(
+    "/my",
+    authMiddleware,
+    async (req, res, next) => {
+        try {
+            const result = await getMyCourses(
+                req.user.userId
+            );
+
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
         }
-        if (await isUserEnrolledInCourse(userId, id)) {
-            const result = await getCourseProgressStats(userId, id);
-            const { total_lessons, completed_lessons } = result[0];
-            const completedPercent = total_lessons === 0 ? 0 : (Number(completed_lessons) / Number(total_lessons)) * 100;
+    }
+);
+
+router.get(
+    "/:id/progress",
+    authMiddleware,
+    validateId,
+    async (req, res, next) => {
+        try {
+            const courseId = Number(req.params.id);
+            const userId = req.user.userId;
+
+            const course =
+                await getCourseById(courseId);
+
+            if (!course) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            if (!await isUserEnrolledInCourse(
+                userId,
+                courseId
+            )) {
+                return res.status(403).json({
+                    message: "You don't have access to this course",
+                });
+            }
+
+            const result =
+                await getCourseProgress(
+                    userId,
+                    courseId
+                );
+
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.get(
+    "/:id/progress/stats",
+    authMiddleware,
+    validateId,
+    async (req, res, next) => {
+        try {
+            const courseId = Number(req.params.id);
+            const userId = req.user.userId;
+
+            const course =
+                await getCourseById(courseId);
+
+            if (!course) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            if (!await isUserEnrolledInCourse(
+                userId,
+                courseId
+            )) {
+                return res.status(403).json({
+                    message: "You don't have access to this course",
+                });
+            }
+
+            const result =
+                await getCourseProgressStats(
+                    userId,
+                    courseId
+                );
+
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.get(
+    "/:id/full",
+    validateId,
+    async (req, res, next) => {
+        try {
+            const result =
+                await getCourseById(
+                    Number(req.params.id)
+                );
+
+            if (!result) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.get(
+    "/:id/lessons",
+    validateId,
+    async (req, res, next) => {
+        try {
+            const course =
+                await getCourseById(
+                    Number(req.params.id)
+                );
+
+            if (!course) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            return res.status(200).json(
+                course.modules.flatMap(
+                    (module: any) =>
+                        module.lessons.map(
+                            (lesson: any) => ({
+                                ...lesson,
+                                moduleId: module.id,
+                                moduleTitle: module.title,
+                                modulePosition: module.position,
+                            })
+                        )
+                )
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.get(
+    "/:id",
+    validateId,
+    async (req, res, next) => {
+        try {
+            const result =
+                await getCourseById(
+                    Number(req.params.id)
+                );
+
+            if (!result) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.post(
+    "/",
+    authMiddleware,
+    validate(createCourseSchema),
+    async (req, res, next) => {
+        try {
+            const {
+                title,
+                description,
+                category,
+                prerequisites = [],
+                technologyIds = [],
+            } = req.body;
+
+            const result = await createCourse(
+                title,
+                description,
+                category,
+                prerequisites,
+                technologyIds,
+                req.user.userId
+            );
+
+            return res.status(201).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.patch(
+    "/:id",
+    authMiddleware,
+    validateId,
+    validate(updateCourseSchema),
+    async (req, res, next) => {
+        try {
+            const {
+                title,
+                description,
+                category,
+                prerequisites,
+                technologyIds,
+            } = req.body;
+
+            const result = await updateCourse(
+                Number(req.params.id),
+                title,
+                description,
+                category,
+                prerequisites,
+                technologyIds,
+                req.user.userId
+            );
+
+            if (result.rowCount === 0) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
+            return res.status(200).json(
+                result.rows[0]
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.delete(
+    "/:id",
+    authMiddleware,
+    validateId,
+    async (req, res, next) => {
+        try {
+            const result = await deleteCourse(
+                Number(req.params.id),
+                req.user.userId
+            );
+
+            if (result.rowCount === 0) {
+                return res.status(404).json({
+                    message: "Course not found",
+                });
+            }
+
             return res.status(200).json({
-                totalLessons: Number(total_lessons),
-                completedLessons: Number(completed_lessons),
-                completedPercent
+                message: "Course deleted",
             });
-        } else {
-            res.status(403).json({
-                message: "You don't have access to this course",
-            })
+        } catch (error) {
+            next(error);
         }
-    } catch (error) {
-        next(error);
     }
-})
-
-router.get("/:id", validateId, async (req, res, next) => {
-
-    try {
-        const id = Number(req.params.id);
-
-        const course = await getCourseById(id);
-
-        if (!course) {
-            res.status(404).json({
-                message: "Course not found"
-            });
-        } else {
-            res.json(course);
-        }
-    } catch (error) {
-        next(error);
-    }
-});
-
-router.post("/", authMiddleware, validate(createCourseSchema), async (req, res, next) => {
-    try {
-        const { title, description } = req.body;
-        const userId = req.user.userId;
-        const result = await createCourse(title, description, userId);
-
-        res.status(201).json(result);
-    } catch (error) {
-        next(error);
-    }
-});
-
-router.delete("/:id", authMiddleware, validateId, async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
-        const userId = req.user.userId;
-        const result = await deleteCourse(id, userId);
-        if (result.rowCount === 0) {
-            res.status(404).json({
-                message: "Course not found"
-            })
-        } else {
-            res.status(200).json({
-                message: "Course deleted"
-            });
-        }
-    } catch (error) {
-        next(error);
-    }
-})
-
-router.patch("/:id", authMiddleware, validateId, validate(updateCourseSchema), async (req, res, next) => {
-    try {
-        const id = Number(req.params.id);
-        const userId = req.user.userId;
-        const { title, description } = req.body;
-        const result = await updateCourse(id, title, description, userId);
-        if (result.rowCount === 0) {
-            res.status(404).json({
-                message: "Course not found"
-            })
-        } else {
-            res.status(200).json(result.rows[0]);
-        }
-    } catch (error) {
-        next(error);
-    }
-})
+);
 
 export default router;

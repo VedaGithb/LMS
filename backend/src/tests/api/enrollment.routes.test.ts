@@ -21,7 +21,8 @@ describe("POST /api/enrollments", () => {
     test("successful user enrollment in the course", async () => {
         const course = await request(app).post('/api/courses').set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         const response = await request(app).post('/api/enrollments').set("Authorization", `Bearer ${user.body.token}`).send({
             courseId: course.body.id
@@ -32,7 +33,8 @@ describe("POST /api/enrollments", () => {
     test("re-enrollment of a user in the same course", async () => {
         const course = await request(app).post('/api/courses').set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         await request(app).post('/api/enrollments').set("Authorization", `Bearer ${user.body.token}`).send({
             courseId: course.body.id
@@ -65,7 +67,8 @@ describe("GET /api/enrollments/my", () => {
         });
         course = await request(app).post('/api/courses').set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
     })
     afterEach(async () => {
@@ -78,8 +81,8 @@ describe("GET /api/enrollments/my", () => {
         });
         const response = await request(app).get('/api/enrollments/my').set("Authorization", `Bearer ${user.body.token}`)
         expect(response.status).toBe(200);
-        expect(response.body[0].id).toBe(course.body.id)
-        expect(response.body[0]).toMatchObject({
+        expect(response.body.courses[0].id).toBe(course.body.id)
+        expect(response.body.courses[0]).toMatchObject({
             title: "Test Course",
             description: "Test description"
         })
@@ -100,7 +103,8 @@ describe("DELETE /api/enrollments/:courseId", () => {
         });
         course = await request(app).post('/api/courses').set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         await request(app).post('/api/enrollments').set("Authorization", `Bearer ${user.body.token}`).send({
             courseId: course.body.id
@@ -135,7 +139,8 @@ describe("GET /api/enrollments/course/:courseId", () => {
         });
         course = await request(app).post('/api/courses').set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         await request(app).post('/api/enrollments').set("Authorization", `Bearer ${user.body.token}`).send({
             courseId: course.body.id

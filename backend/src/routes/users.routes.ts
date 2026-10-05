@@ -23,6 +23,7 @@ router.post("/login", validate(loginUserSchema), async (req, res, next) => {
 
         if (result === null) {
             return res.status(401).json({
+                code: "INVALID_CREDENTIALS",
                 message: "Invalid email or password",
             })
         } else {

@@ -38,13 +38,28 @@ describe("GET /api/courses/my", () => {
             email: "user2@example.com",
             password: "123556"
         });
-        await createCourse("My Course", "My description", user1.body.user.id)
-        await createCourse("My Course 2", "My description 2", user2.body.user.id)
+        await createCourse(
+            "My Course",
+            "My description",
+            "Backend",
+            [],
+            [],
+            user1.body.user.id
+        );
+
+        await createCourse(
+            "My Course 2",
+            "My description 2",
+            "Frontend",
+            [],
+            [],
+            user2.body.user.id
+        );
         const response = await request(app).get("/api/courses/my").set(`Authorization`, `Bearer ${user1.body.token}`);
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(expect.arrayContaining([{ title: "My Course" }]))
+        expect(response.body).toEqual(expect.arrayContaining([expect.objectContaining({ title: "My Course" })]))
         expect(response.body).toHaveLength(1)
-        expect(response.body).not.toEqual(expect.arrayContaining([{ title: "My Course 2" }]))
+        expect(response.body).not.toEqual(expect.arrayContaining([expect.objectContaining({ title: "My Course 2" })]))
     })
 })
 
@@ -67,10 +82,11 @@ describe("POST /api/courses", () => {
     test("successful creation of the course", async () => {
         const response = await  request(app).post("/api/courses").set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         expect(response.status).toBe(201);
-        expect(response.body).toMatchObject({ title: "Test Course", description: "Test description", user_id: user.body.user.id })
+        expect(response.body).toMatchObject({ title: "Test Course", description: "Test description", category: "Programming", owner_id: user.body.user.id })
     });
 
     test("rejects invalid course data", async () => {
@@ -101,7 +117,8 @@ describe("DELETE /api/courses/:id", () => {
     test("successful course deletion", async () => {
         const course = await  request(app).post("/api/courses").set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         const response = await request(app).delete(`/api/courses/${course.body.id}`).set(`Authorization`, `Bearer ${user.body.token}`)
         expect(response.status).toBe(200);
@@ -123,7 +140,8 @@ describe("DELETE /api/courses/:id", () => {
         });
         const course = await request(app).post("/api/courses").set(`Authorization`, `Bearer ${user2.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
 
         const response = await request(app).delete(`/api/courses/${course.body.id}`).set(`Authorization`, `Bearer ${user.body.token}`)
@@ -150,7 +168,8 @@ describe("PATCH /api/courses/:id", () => {
     test("successful course update", async () => {
         const course = await  request(app).post("/api/courses").set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         const response = await request(app).patch(`/api/courses/${course.body.id}`).set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course patch",
@@ -158,14 +177,16 @@ describe("PATCH /api/courses/:id", () => {
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             title: "Test Course patch",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
     });
 
     test("rejects invalid course data", async () => {
         const course = await  request(app).post("/api/courses").set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
         const response = await request(app).patch(`/api/courses/${course.body.id}`).set(`Authorization`, `Bearer ${user.body.token}`).send({
             title: "TC",
@@ -191,7 +212,8 @@ describe("PATCH /api/courses/:id", () => {
         });
         const course = await request(app).post("/api/courses").set(`Authorization`, `Bearer ${user2.body.token}`).send({
             title: "Test Course",
-            description: "Test description"
+            description: "Test description",
+            category: "Programming"
         });
 
         const response = await request(app).patch(`/api/courses/${course.body.id}`).set(`Authorization`, `Bearer ${user.body.token}`).send({
