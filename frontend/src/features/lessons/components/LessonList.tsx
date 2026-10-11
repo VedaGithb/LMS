@@ -3,6 +3,7 @@ import type { LessonWithProgress } from "../types";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useState } from "react";
+import { pluralize } from "../../../shared/utils/pluralize";
 
 type LessonListProps = {
     lessons: LessonWithProgress[];
@@ -22,7 +23,7 @@ export const LessonList = ({ lessons, nextLessonId }: LessonListProps) => {
     return (
         <div>
             <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold">Программа курса ({lessons.length} уроков)</h3>
+                <h3 className="text-lg font-bold">Программа курса ({lessons.length} {pluralize(lessons.length, "курс", "курса", "курсов")})</h3>
             </div>
             {showAuthWarning && (
                 <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
