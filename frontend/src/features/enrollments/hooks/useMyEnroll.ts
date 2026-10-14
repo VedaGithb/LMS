@@ -1,13 +1,13 @@
-import {getMyEnrollments} from "../api/enrollment.api";
-import {useQuery} from "@tanstack/react-query";
-import {useAuth} from "../../auth/hooks/useAuth";
+import { getMyEnrollments } from "../api/enrollment.api";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 export const useMyEnroll = () => {
     const { isAuthenticated } = useAuth()
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['myEnroll'],
         queryFn: getMyEnrollments,
         enabled: isAuthenticated,
     });
-    return {data, isLoading, isError, error};
+    return { data, isLoading, isError, error, refetch };
 }

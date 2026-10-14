@@ -2,8 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import App from "./app/App";
+
 import { QueryProvider } from "./app/provider/QueryProvider";
-import {AuthProvider} from "./features/auth/context/AuthProvider";
+import { AuthProvider } from "./features/auth/context/AuthProvider";
+import { SettingsProvider } from "./features/settings/context/SettingsProvider";
+
 
 import "./styles/global.css";
 
@@ -14,8 +17,10 @@ ReactDOM.createRoot(
     <React.StrictMode>
         <QueryProvider>
             <AuthProvider>
-                <App />
+                <SettingsProvider>
+                    <App />
+                </SettingsProvider>
             </AuthProvider>
         </QueryProvider>
     </React.StrictMode>
-);
+);  
