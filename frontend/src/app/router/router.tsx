@@ -9,6 +9,7 @@ import { CoursesPage } from "../../pages/CoursesPage";
 import { ProtectedLayout } from "../../shared/layouts/ProtectedLayout";
 import { CoursePage } from "../../pages/CoursePage";
 import { LessonPage } from "../../pages/LessonPage";
+import { ProfilePage } from "../../pages/ProfilePage";
 
 export const router = createBrowserRouter([
     {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
                     {
                         path: "/lessons/:id",
                         element: <LessonPage />
+                    },
+                    {
+                        path: "/profile",
+                        element: <ProfilePage />
                     }
                 ]
             }
