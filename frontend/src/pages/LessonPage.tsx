@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useLesson } from "../features/lessons/hooks/useLesson";
 import { useCourseProgress } from "../features/progress/hooks/useCourseProgress";
 import { LessonContent } from "../features/lessons/components/LessonContent";
@@ -6,11 +6,14 @@ import { LessonHeader } from "../features/lessons/components/LessonHeader";
 import { ArrowLeft, ArrowRight, CircleCheck, CircleCheckBig, Clock } from "lucide-react";
 import { useCourse } from "../features/courses/hooks/useCourse";
 import { useUpdateLessonProgress } from "../features/lessons/hooks/useUpdateLessonProgress";
+import { useSettings } from "../features/settings/hooks/useSettings";
 
 export const LessonPage = () => {
     const { id } = useParams();
     const { data, isLoading, isError } = useLesson(id);
     const { data: course, isLoading: courseLoading } = useCourse(data?.course.id ? String(data.course.id) : undefined);
+    const { setting } = useSettings();
+    const navigate = useNavigate();
     const { data: progress, isLoading: progressLoading } = useCourseProgress(data?.course.id ? String(data.course.id) : undefined, true);
     const mutation = useUpdateLessonProgress();
 
@@ -32,7 +35,15 @@ export const LessonPage = () => {
     });
 
     const toggleProgress = () => {
-        mutation.mutate({ lessonId: data.id, completed: !data.completed })
+        const isAutoNavigate = !data.completed && setting.autoNextLesson && data.next;
+        mutation.mutate({ lessonId: data.id, completed: !data.completed }, {
+            onSuccess: () => {
+                if (isAutoNavigate && data.next) {
+                    navigate(`/lessons/${data.next.id}`);
+                }
+            }
+        }
+        )
     }
 
     const completedLessonsIds = new Set(progress?.lessons.filter((lesson) => lesson.completed).map((lesson) => lesson.id) ?? []);

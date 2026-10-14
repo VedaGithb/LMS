@@ -98,7 +98,7 @@ export const Header = () => {
                             <p className="text-base text-slate-700 truncate">{auth.user!.email}</p>
                         </div>
                         <Link to="/profile" className="block px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md">Профиль</Link>
-                        <button onClick={toggleSetting} className="inline-block px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md">Настройки</button>
+                        <button onClick={toggleSetting} className="w-full text-left block px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-md">Настройки</button>
                         <button className="block px-4 py-2 hover:bg-slate-100 rounded-md w-full text-left text-red-500 border-t border-slate-200" onClick={() => { auth.logout(); setIsMenuOpen(false); }}>Выйти</button>
                     </div>
                 )}

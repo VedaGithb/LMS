@@ -8,7 +8,7 @@ interface SettingModalProps {
 }
 
 export const SettingModal = ({ onClose }: SettingModalProps) => {
-    const { setting, setTheme, setTextSize } = useSettings();
+    const { setting, setTheme, setTextSize, updateSetting } = useSettings();
 
     useEffect(() => {
         const handleKeydown = (e: KeyboardEvent) => {
@@ -46,7 +46,7 @@ export const SettingModal = ({ onClose }: SettingModalProps) => {
                     </button>
                 </div>
                 <div className="p-6">
-                    <h3 className="uppercase text-slate-400">01/внешний вид</h3>
+                    <h3 className="uppercase text-slate-400 font-bold">01/внешний вид</h3>
                     <p className="text-slate-600 text-sm mt-3">Тема оформления</p>
                     <div className="grid grid-cols-2 bg-slate-100 p-1.5 rounded-xl gap-4 mt-1">
                         <button type="button" onClick={() => setTheme("light")} className={`flex items-center justify-center gap-3 rounded-xl px-2 py-1 ${setting.theme === "light" ? `bg-white text-indigo-600 shadow-sm` : `hover:bg-slate-200`}`}><Sun className="w-6 h-6" />Светлая</button>
@@ -94,6 +94,49 @@ export const SettingModal = ({ onClose }: SettingModalProps) => {
                                 className="w-4 h-4"
                             />
                         </label>
+                    </div>
+                </div>
+                <div className="p-6">
+                    <h3 className="uppercase text-slate-400 font-bold mb-2">02/процесс обучения</h3>
+                    <div className="grid grid-rows-2 gap-2 bg-slate-100 rounded-lg border border-slate-300">
+                        <div className="flex items-center justify-between border-b border-slate-300 px-4 py-3">
+                            <div>
+                                <p className="text-slate-700 font-bold text-sm">Автоматически переходить к следующему уроку</p>
+                                <p className="text-slate-500 text-xs">Открывать следующий урок после завершения текущего</p>
+                            </div>
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={setting.autoNextLesson}
+                                onClick={() => updateSetting("autoNextLesson", !setting.autoNextLesson)}
+                                className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 cursor-pointer ${setting.autoNextLesson ? "bg-indigo-600" : "bg-slate-300"
+                                    }`}
+                            >
+                                <div
+                                    className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${setting.autoNextLesson ? "translate-x-5" : "translate-x-0"
+                                        }`}
+                                />
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-3">
+                            <div>
+                                <p className="text-slate-700 font-bold text-sm">Запоминать место в уроке</p>
+                                <p className="text-slate-500 text-xs">При повторном открытии возвращаться к последнему месту изучения</p>
+                            </div>
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={setting.rememberLessonPosition}
+                                onClick={() => updateSetting("rememberLessonPosition", !setting.rememberLessonPosition)}
+                                className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 cursor-pointer ${setting.rememberLessonPosition ? "bg-indigo-600" : "bg-slate-300"
+                                    }`}
+                            >
+                                <div
+                                    className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${setting.rememberLessonPosition ? "translate-x-5" : "translate-x-0"
+                                        }`}
+                                />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
