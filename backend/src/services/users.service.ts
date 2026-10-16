@@ -35,3 +35,23 @@ export async function loginUser(email: string, password: string) {
         return null;
     }
 }
+
+export async function changePassword(userId: number, currentPassword: string, newPassword: string) {
+    const result = await pool.query(
+        `SELECT password FROM users WHERE id=$1`,
+        [userId]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    if (!await bcrypt.compare(currentPassword, result.rows[0].password)) return false;
+
+    const hash = await bcrypt.hash(newPassword, 10);
+    await pool.query(
+        `UPDATE users SET password = $1 WHERE id=$2`,
+        [hash, userId]
+    );
+    return true;
+}

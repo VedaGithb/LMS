@@ -1,8 +1,8 @@
-import {useState, type ReactNode} from "react";
+import { useState, type ReactNode } from "react";
 import { isAxiosError } from "axios";
 import { AuthContext } from "./AuthContext";
-import type {AuthState} from "../types";
-import {loginUser, registerUser} from "../api/auth.api";
+import type { AuthState } from "../types";
+import { changePassword, loginUser, registerUser } from "../api/auth.api";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [state, setState] = useState<AuthState>(() => {
@@ -10,13 +10,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userData = localStorage.getItem("auth_user");
 
         if (token && userData) {
-            const user = JSON.parse(userData);
-            return {
-                user,
-                token,
-                isAuthenticated: true,
-                error: null
-            };
+            try {
+                const user = JSON.parse(userData);
+                return {
+                    user,
+                    token,
+                    isAuthenticated: true,
+                    error: null
+                };
+            } catch {
+                localStorage.removeItem("auth_token");
+                localStorage.removeItem("auth_user");
+                return {
+                    user: null,
+                    token: null,
+                    isAuthenticated: false,
+                    error: null
+                }
+            }
         } else {
             return {
                 user: null,
@@ -81,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         }));
 
                         return true;
-                    } catch(e) {
+                    } catch (e) {
                         let error;
                         if (isAxiosError(e)) {
                             const code = e.response?.data?.code;
@@ -104,6 +115,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             isAuthenticated: false,
                             error: error
                         })
+                        return false;
+                    }
+                },
+                changePassword: async (currentPassword, newPassword) => {
+                    try {
+                        await changePassword(currentPassword, newPassword);
+
+                        setState((prevState) => ({
+                            ...prevState,
+                            error: null
+                        }));
+
+                        return true;
+                    } catch (e) {
+                        let error;
+                        if (isAxiosError(e)) {
+                            const code = e.response?.data?.code;
+
+                            if (code === "USER_NOT_FOUND") {
+                                error = "Пользователь не найден";
+                            } else if (code === "INVALID_CURRENT_PASSWORD") {
+                                error = "Неверный текущий пароль";
+                            } else {
+                                error = e.response?.data?.message;
+                            }
+                        } else if (e instanceof Error) {
+                            error = e.message;
+                        } else {
+                            error = "Произошла ошибка смены пароля";
+                        }
+                        setState((prevState) => ({
+                            ...prevState,
+                            error: error
+                        }))
                         return false;
                     }
                 },

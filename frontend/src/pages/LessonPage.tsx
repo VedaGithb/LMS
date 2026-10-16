@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, CircleCheck, CircleCheckBig, Clock } from "lucid
 import { useCourse } from "../features/courses/hooks/useCourse";
 import { useUpdateLessonProgress } from "../features/lessons/hooks/useUpdateLessonProgress";
 import { useSettings } from "../features/settings/hooks/useSettings";
+import { useEffect } from "react";
 
 export const LessonPage = () => {
     const { id } = useParams();
@@ -16,6 +17,40 @@ export const LessonPage = () => {
     const navigate = useNavigate();
     const { data: progress, isLoading: progressLoading } = useCourseProgress(data?.course.id ? String(data.course.id) : undefined, true);
     const mutation = useUpdateLessonProgress();
+
+    useEffect(() => {
+        const storageKey = `lesson_scroll_${id}`;
+        const savedPosition = localStorage.getItem(storageKey);
+
+        if (setting.rememberLessonPosition && savedPosition && data) {
+            window.scrollTo({
+                top: Number(savedPosition),
+                behavior: "smooth",
+            });
+        }
+
+    }, [id, data, setting.rememberLessonPosition])
+
+    useEffect(() => {
+        if (!setting.rememberLessonPosition || !id) return;
+
+        let timeoutId: number | undefined;
+
+
+        const storageKey = `lesson_scroll_${id}`;
+
+        const handleScroll = () => {
+            if (typeof (timeoutId) === "number") clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => localStorage.setItem(storageKey, String(window.scrollY)), 200);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll)
+            clearTimeout(timeoutId)
+        };
+    }, [id, setting.rememberLessonPosition])
 
     if (isLoading || courseLoading || progressLoading) {
         return <div>Загрузка урока...</div>

@@ -10,6 +10,7 @@ import { ProtectedLayout } from "../../shared/layouts/ProtectedLayout";
 import { CoursePage } from "../../pages/CoursePage";
 import { LessonPage } from "../../pages/LessonPage";
 import { ProfilePage } from "../../pages/ProfilePage";
+import { NotFoundPage } from "../../pages/NotFoundPage";
 
 export const router = createBrowserRouter([
     {
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
             {
                 path: "/courses/:id",
                 element: <CoursePage />
+            },
+            {
+                path: "*",
+                element: <NotFoundPage />
             }
         ]
     },
