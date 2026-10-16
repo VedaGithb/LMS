@@ -32,3 +32,4 @@ backend/.vscode
 frontend/node_modules
 frontend/.idea
 AGENTS.md
+.playwright-mcp

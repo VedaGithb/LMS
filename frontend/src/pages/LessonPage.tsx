@@ -85,41 +85,78 @@ export const LessonPage = () => {
 
     return (
         <main className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen">
-            <div className="max-w-[1700px] mx-auto px-6 my-8">
+            <div className="max-w-[1700px] mx-auto px-4 sm:px-6 my-6 sm:my-8">
                 <LessonHeader data={data} progress={progress} />
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start my-12">
-                    <div className="lg:col-span-8 ">
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-10 mb-10">
-                            <div className="flex gap-6 items-center mb-10">
-                                <p className=" bg-indigo-200 w-fit py-1 px-1.5 text-sm rounded-lg">{data.module.title}</p>
-                                <p className="flex items-center gap-2 text-sm text-slate-600"><Clock className="w-4 h-4" />{data.durationMinutes} мин чтения</p>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start my-8 sm:my-12">
+                    <div className="lg:col-span-8">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 md:p-10 mb-8 sm:mb-10">
+                            <div className="flex flex-wrap gap-3 sm:gap-6 items-center mb-6 sm:mb-10">
+                                <p className="bg-indigo-100 text-indigo-700 font-medium w-fit py-1 px-2.5 text-xs sm:text-sm rounded-lg">
+                                    {data.module.title}
+                                </p>
+                                <p className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500">
+                                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                    {data.durationMinutes} мин чтения
+                                </p>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-2 mb-4">{data.title}</h1>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mt-2 mb-4">
+                                {data.title}
+                            </h1>
                             <LessonContent content={{ ...data.content, blocks: displayBlocks }} />
                         </div>
-                        <div className="flex justify-between">
-                            {data.previous ? <Link to={`/lessons/${data.previous.id}`} className="flex items-center gap-2 max-w-[260px] text-indigo-600 hover:text-indigo-800">
-                                <ArrowLeft className="w-4 h-4 shrink-0" />
-                                <span className="truncate">Предыдущий урок ({data.previous.title})</span>
-                            </Link>
-                                : <div></div>}
-                            {data.completed
-                                ? <button className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shrink-0" onClick={toggleProgress} disabled={mutation.isPending}><CircleCheckBig className="w-4 h-4" /> Урок пройден (отменить)</button>
-                                : <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 shrink-0" onClick={toggleProgress} disabled={mutation.isPending}><CircleCheckBig className="w-4 h-4" /> Отметить урок как пройденный</button>
 
-                            }
-                            {data.next ? <Link to={`/lessons/${data.next.id}`} className="flex items-center gap-2 max-w-[260px] text-indigo-600 hover:text-indigo-800 text-right">
-                                <span className="truncate">Следующий урок ({data.next.title})</span>
-                                <ArrowRight className="w-4 h-4 shrink-0" />
-                            </Link>
-                                : <div></div>}
+                        {/* Responsive bottom navigation */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-6 bg-white sm:bg-transparent p-4 sm:p-0 rounded-2xl shadow-sm sm:shadow-none border border-slate-200/80 sm:border-0">
+                            {data.previous ? (
+                                <Link
+                                    to={`/lessons/${data.previous.id}`}
+                                    className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium order-2 sm:order-1"
+                                >
+                                    <ArrowLeft className="w-4 h-4 shrink-0" />
+                                    <span className="truncate max-w-[200px]">Предыдущий: {data.previous.title}</span>
+                                </Link>
+                            ) : (
+                                <div className="hidden sm:block order-1"></div>
+                            )}
+
+                            <div className="order-1 sm:order-2">
+                                {data.completed ? (
+                                    <button
+                                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-700 font-medium text-sm transition-colors shadow-sm"
+                                        onClick={toggleProgress}
+                                        disabled={mutation.isPending}
+                                    >
+                                        <CircleCheckBig className="w-4 h-4 shrink-0" /> Урок пройден (отменить)
+                                    </button>
+                                ) : (
+                                    <button
+                                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 font-medium text-sm transition-colors shadow-sm"
+                                        onClick={toggleProgress}
+                                        disabled={mutation.isPending}
+                                    >
+                                        <CircleCheckBig className="w-4 h-4 shrink-0" /> Отметить урок как пройденный
+                                    </button>
+                                )}
+                            </div>
+
+                            {data.next ? (
+                                <Link
+                                    to={`/lessons/${data.next.id}`}
+                                    className="flex items-center justify-end gap-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium order-3"
+                                >
+                                    <span className="truncate max-w-[200px]">Следующий: {data.next.title}</span>
+                                    <ArrowRight className="w-4 h-4 shrink-0" />
+                                </Link>
+                            ) : (
+                                <div className="hidden sm:block order-3"></div>
+                            )}
                         </div>
                     </div>
 
                     <div className="lg:col-span-4">
-                        <div className="bg-white py-5 px-6 rounded-lg shadow-sm sticky top-6 max-h-[calc(100vh-5rem)] overflow-y-auto">
-                            <h4 className="font-bold text-lg">Содержание курса</h4>
+                        <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 sticky top-6 max-h-[calc(100vh-5rem)] overflow-y-auto">
+                            <h4 className="font-bold text-base sm:text-lg text-slate-900 mb-2">Содержание курса</h4>
                             <div>
                                 {course.modules.map((module) => (
                                     <div key={module.id} className="mb-4 border-b border-slate-300 last:border-0 pb-2">

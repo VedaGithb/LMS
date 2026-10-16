@@ -25,29 +25,41 @@ export const MyLearningPage = () => {
 
     return (
         <main className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen">
-            <div className="max-w-[1700px] mx-auto px-6 my-8">
+            <div className="max-w-[1700px] mx-auto px-4 sm:px-6 my-6 sm:my-8">
                 <div>
                     <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                        <span className="uppercase text-indigo-500">личный кабинет студента</span>
+                        <span className="uppercase text-indigo-600 text-xs font-semibold tracking-wider">
+                            Личный кабинет студента
+                        </span>
                     </div>
-                    <div className="flex justify-between mt-2 flex-col md:flex-row">
+                    <div className="flex justify-between items-start mt-3 flex-col lg:flex-row gap-6">
                         <div>
-                            <h1 className="text-4xl font-bold mb-1">Мои курсы</h1>
-                            <p className="text-slate-600">Курсы, на которые вы записаны. Продолжайте обучение в удобном темпе.</p>
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2">Мои курсы</h1>
+                            <p className="text-slate-600 text-sm sm:text-base max-w-xl">
+                                Курсы, на которые вы записаны. Продолжайте обучение в удобном темпе.
+                            </p>
                         </div>
-                        <div className="flex gap-4">
-                            <div className="bg-white p-4 rounded-lg shadow-md">
-                                <p>Активных курсов</p>
-                                <p><span className="font-bold text-xl mr-1">{data.stats.activeCourses}</span> из {data.courses.length}</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full lg:w-auto">
+                            <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                                <p className="text-slate-500 text-xs sm:text-sm font-medium">Активных курсов</p>
+                                <p className="text-slate-900 mt-1">
+                                    <span className="font-bold text-xl sm:text-2xl mr-1">{data.stats.activeCourses}</span>
+                                    <span className="text-xs sm:text-sm text-slate-500">из {data.courses.length}</span>
+                                </p>
                             </div>
-                            <div className="bg-white p-4 rounded-lg shadow-md">
-                                <p>Завершено уроков</p>
-                                <p><span className="font-bold text-xl mr-1">{data.stats.completedLessons}</span> <span className="text-emerald-700">уроков</span></p>
+                            <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                                <p className="text-slate-500 text-xs sm:text-sm font-medium">Завершено уроков</p>
+                                <p className="text-slate-900 mt-1">
+                                    <span className="font-bold text-xl sm:text-2xl mr-1">{data.stats.completedLessons}</span>
+                                    <span className="text-emerald-600 text-xs sm:text-sm font-medium">уроков</span>
+                                </p>
                             </div>
-                            <div className="bg-white p-4 rounded-lg shadow-md">
-                                <p>Средний прогресс</p>
-                                <p className="font-bold text-xl mr-1 text-indigo-500">{data.stats.averageProgress}%</p>
+                            <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                                <p className="text-slate-500 text-xs sm:text-sm font-medium">Средний прогресс</p>
+                                <p className="font-bold text-xl sm:text-2xl text-indigo-600 mt-1">
+                                    {data.stats.averageProgress}%
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -69,15 +81,22 @@ export const MyLearningPage = () => {
                         )
                 }
 
-                <div className="bg-indigo-50 rounded-lg p-8 mt-12 flex justify-between items-center">
-                    <div className="flex items-center gap-6">
-                        <Compass className="w-11 h-11 text-indigo-600 bg-white p-2 rounded-lg" />
+                <div className="bg-indigo-50 rounded-2xl p-5 sm:p-8 mt-10 sm:mt-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border border-indigo-100/80">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                        <Compass className="w-10 h-10 sm:w-11 sm:h-11 text-indigo-600 bg-white p-2 rounded-xl shrink-0 shadow-sm" />
                         <div>
-                            <h3 className="text-xl font-semibold">Ищете новые направления?</h3>
-                            <p className="text-slate-700">Хотите освоить новую технологию? Ознакомьтесь с новыми направлениями в общем каталоге.</p>
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900">Ищете новые направления?</h3>
+                            <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-xl">
+                                Хотите освоить новую технологию? Ознакомьтесь с новыми направлениями в общем каталоге.
+                            </p>
                         </div>
                     </div>
-                    <Link to="/courses" className="bg-white py-2 px-6 rounded-lg flex items-center gap-2 w-fit">Перейти в каталог <ArrowRight className="w-4 h-4" /></Link>
+                    <Link
+                        to="/courses"
+                        className="w-full sm:w-auto justify-center bg-white hover:bg-slate-50 text-indigo-700 font-medium py-2.5 px-6 rounded-xl flex items-center gap-2 shadow-sm transition-colors text-sm sm:text-base shrink-0"
+                    >
+                        Перейти в каталог <ArrowRight className="w-4 h-4" />
+                    </Link>
                 </div>
             </div>
         </main>

@@ -9,33 +9,51 @@ type CourseCardProps = {
 
 export const CourseCard = ({course}: CourseCardProps) => {
     return (
-        <Link to={`/courses/${course.id}`} className=
-                 "bg-white rounded-lg p-6 mx-auto group hover:shadow-lg transition-shadow duration-300"
+        <Link
+            to={`/courses/${course.id}`}
+            className="w-full bg-white rounded-2xl p-5 sm:p-6 group hover:shadow-md transition-all duration-300 border border-slate-200/80 flex flex-col justify-between"
         >
-            <div className="flex items-center justify-between mb-10">
-                <p className="bg-indigo-200 p-2 rounded-lg text-sm">{course.category}</p>
-                <p className="flex items-center gap-2 text-sm"><BookOpenText className="w-5 h-5"/>{course.lessonsCount} уроков</p>
-            </div>
-            <div className="flex items-center gap-3 mb-5">
-                <div className="bg-indigo-100 p-2 rounded-lg">
-                    <Code2 className="w-6 h-6"/>
+            <div>
+                <div className="flex items-center justify-between gap-2 mb-6 sm:mb-8">
+                    <p className="bg-indigo-100 text-indigo-700 font-medium px-2.5 py-1 rounded-lg text-xs sm:text-sm">
+                        {course.category}
+                    </p>
+                    <p className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500">
+                        <BookOpenText className="w-4 h-4 text-slate-400" />
+                        {course.lessonsCount} уроков
+                    </p>
                 </div>
-                <p className="text-2xl font-bold text-slate-900 flex items-center gap-4 group-hover:text-indigo-700 transition-colors">{course.title}</p>
-            </div>
-            <p className="text-base text-slate-600 leading-relaxed min-h-20">{course.description}</p>
-            <div className="flex items-center gap-2 mt-8">
-                {course.technologies.map((tech, index) => (
-                    <div key={tech} className="flex items-center gap-2">
-                        <p className='text-base text-slate-700 bg-indigo-100 px-2 py-1 rounded-lg'>{tech}</p>
-                        {index < course.technologies.length - 1 && <span className="w-1 h-1 rounded-full bg-indigo-900"></span>}
+                <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="bg-indigo-50 text-indigo-600 p-2 rounded-xl shrink-0">
+                        <Code2 className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                ))}
+                    <p className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        {course.title}
+                    </p>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6 line-clamp-3">
+                    {course.description}
+                </p>
             </div>
-            <div className="mt-8 flex items-center justify-between">
-                <p className="text-base text-slate-500">{formatDuration(course.totalDuration)}</p>
 
-                <div className="flex items-center gap-2 text-indigo-800 text-xl">Открыть курс <ArrowRight className="w-6 h-6"/></div>
+            <div>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-6">
+                    {course.technologies.map((tech) => (
+                        <span
+                            key={tech}
+                            className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md"
+                        >
+                            {tech}
+                        </span>
+                    ))}
+                </div>
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm">
+                    <p className="text-slate-500 font-medium">{formatDuration(course.totalDuration)}</p>
+                    <div className="flex items-center gap-1.5 text-indigo-600 font-semibold group-hover:translate-x-0.5 transition-transform">
+                        Открыть курс <ArrowRight className="w-4 h-4" />
+                    </div>
+                </div>
             </div>
         </Link>
-    )
-}
+    );
+};

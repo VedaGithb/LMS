@@ -104,29 +104,29 @@ export const CoursePage = () => {
 
 
     return (
-        <main className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen ">
-            <div className="max-w-[1700px] mx-auto px-6 my-8">
-                <section className="mb-4 flex">
-                    <House className="w-5 h-5 mx-2" />
+        <main className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen">
+            <div className="max-w-[1700px] mx-auto px-4 sm:px-6 my-6 sm:my-8">
+                <section className="mb-4 flex flex-wrap items-center text-xs sm:text-sm gap-y-1">
+                    <House className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 shrink-0 text-slate-500" />
                     <Link to="/" className="text-slate-600 mr-1 hover:underline">Главная</Link>
-                    <span className="text-slate-600 mr-1">/</span>
+                    <span className="text-slate-400 mr-1">/</span>
                     <Link to="/courses" className="text-slate-600 mr-1 hover:underline">Все курсы</Link>
-                    <span className="text-slate-600 mr-1">/</span>
-                    <p className="text-slate-800 mr-1 font-bold">{data.title}</p>
+                    <span className="text-slate-400 mr-1">/</span>
+                    <p className="text-slate-800 font-bold truncate max-w-[200px] sm:max-w-none">{data.title}</p>
                 </section>
                 <CourseHeader course={data} nextLesson={nextLesson} onStartLearning={handleStartLearning} isPending={mutation.isPending} />
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                     <div className="lg:col-span-8">
-                        <div className="my-8">
+                        <div className="my-6 sm:my-8">
                             {progress && <CourseProgress stats={progress} nextLesson={nextLesson} />}
                         </div>
                         <LessonList lessons={lessonsWithProgress} nextLessonId={nextLesson?.id} />
                     </div>
-                    <aside className="lg:col-span-4 my-8">
+                    <aside className="lg:col-span-4 my-6 sm:my-8">
                         <CourseSidebar course={data} />
                     </aside>
                 </div>
             </div>
         </main>
-    )
+    );
 }

@@ -74,10 +74,12 @@ export const ProfilePage = () => {
                     <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-700 to-indigo-500 text-white flex items-center justify-center shadow-md text-2xl font-bold uppercase shrink-0">
                         {auth.user?.email?.slice(0, 2) || <CircleUser className="w-12 h-12" />}
                     </div>
-                    <div className="flex-1 text-center sm:text-left">
-                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-                            <h1 className="text-2xl font-bold text-slate-900">{auth.user?.email}</h1>
-                            <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-semibold">
+                    <div className="flex-1 min-w-0 w-full text-center sm:text-left">
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-3">
+                            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 break-all max-w-full">
+                                {auth.user?.email}
+                            </h1>
+                            <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-semibold shrink-0">
                                 Студент платформы
                             </span>
                         </div>
@@ -123,7 +125,7 @@ export const ProfilePage = () => {
                                 type="email"
                                 disabled
                                 value={auth.user?.email || ""}
-                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 cursor-not-allowed text-sm"
+                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 cursor-not-allowed text-sm truncate"
                             />
                         </div>
                         <p className="text-xs text-slate-400 mt-1.5">Email используется для входа в систему и не подлежит изменению</p>
