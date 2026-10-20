@@ -3,7 +3,7 @@ import { useLesson } from "../features/lessons/hooks/useLesson";
 import { useCourseProgress } from "../features/progress/hooks/useCourseProgress";
 import { LessonContent } from "../features/lessons/components/LessonContent";
 import { LessonHeader } from "../features/lessons/components/LessonHeader";
-import { ArrowLeft, ArrowRight, CircleCheck, CircleCheckBig, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleCheck, CircleCheckBig, Clock, Loader2, AlertCircle } from "lucide-react";
 import { useCourse } from "../features/courses/hooks/useCourse";
 import { useUpdateLessonProgress } from "../features/lessons/hooks/useUpdateLessonProgress";
 import { useSettings } from "../features/settings/hooks/useSettings";
@@ -11,11 +11,11 @@ import { useEffect } from "react";
 
 export const LessonPage = () => {
     const { id } = useParams();
-    const { data, isLoading, isError } = useLesson(id);
+    const { data, isLoading, isError, refetch } = useLesson(id);
     const { data: course, isLoading: courseLoading } = useCourse(data?.course.id ? String(data.course.id) : undefined);
     const { setting } = useSettings();
     const navigate = useNavigate();
-    const { data: progress, isLoading: progressLoading } = useCourseProgress(data?.course.id ? String(data.course.id) : undefined, true);
+    const { data: progress } = useCourseProgress(data?.course.id ? String(data.course.id) : undefined, true);
     const mutation = useUpdateLessonProgress();
 
     useEffect(() => {
@@ -52,17 +52,27 @@ export const LessonPage = () => {
         };
     }, [id, setting.rememberLessonPosition])
 
-    if (isLoading || courseLoading || progressLoading) {
-        return <div>Загрузка урока...</div>
+    if (isLoading) {
+        return (
+            <div className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen flex items-center justify-center gap-2">
+                <Loader2 className="animate-spin text-indigo-600" size={24} />
+                <span className="text-slate-600 font-medium">Загрузка урока...</span>
+            </div>
+        );
     }
-    if (isError) {
-        return <div>Ошибка загрузки урока</div>
-    }
-    if (!data) {
-        return <div>Урок не найден</div>
-    }
-    if (!course) {
-        return <div>Курс не найден</div>
+
+    if (isError || !data) {
+        return (
+            <div className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen flex flex-col items-center justify-center gap-3">
+                <p className="text-slate-700 font-medium">Не удалось загрузить урок</p>
+                <button
+                    onClick={() => refetch()}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition-colors shadow-sm"
+                >
+                    Попробовать снова <AlertCircle className="text-red-300" size={18} />
+                </button>
+            </div>
+        );
     }
 
     const displayBlocks = data.content.blocks.filter((block, index) => {
@@ -158,23 +168,29 @@ export const LessonPage = () => {
                         <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 sticky top-6 max-h-[calc(100vh-5rem)] overflow-y-auto">
                             <h4 className="font-bold text-base sm:text-lg text-slate-900 mb-2">Содержание курса</h4>
                             <div>
-                                {course.modules.map((module) => (
-                                    <div key={module.id} className="mb-4 border-b border-slate-300 last:border-0 pb-2">
-                                        <p className="font-semibold text-xs text-slate-600 uppercase mt-2">{module.title}</p>
-                                        {module.lessons.map((lesson) => (
-                                            <Link
-                                                key={lesson.id}
-                                                to={`/lessons/${lesson.id}`}
-                                                className={`block text-sm ${lesson.id === data.id ? 'font-bold bg-indigo-100 text-indigo-700 p-2 my-1 rounded-lg' : 'text-slate-600 hover:text-slate-900'}`}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    {completedLessonsIds.has(lesson.id) ? <CircleCheck className="w-6 h-6 text-emerald-600" /> : <div className="w-4" />}{lesson.title}
-                                                </div>
-                                            </Link>
-                                        ))}
-
+                                {courseLoading || !course ? (
+                                    <div className="flex items-center gap-2 py-4 text-slate-500 text-sm">
+                                        <Loader2 className="animate-spin text-indigo-600 w-4 h-4" />
+                                        <span>Загрузка содержания...</span>
                                     </div>
-                                ))}
+                                ) : (
+                                    course.modules.map((module) => (
+                                        <div key={module.id} className="mb-4 border-b border-slate-300 last:border-0 pb-2">
+                                            <p className="font-semibold text-xs text-slate-600 uppercase mt-2">{module.title}</p>
+                                            {module.lessons.map((lesson) => (
+                                                <Link
+                                                    key={lesson.id}
+                                                    to={`/lessons/${lesson.id}`}
+                                                    className={`block text-sm ${lesson.id === data.id ? 'font-bold bg-indigo-100 text-indigo-700 p-2 my-1 rounded-lg' : 'text-slate-600 hover:text-slate-900'}`}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        {completedLessonsIds.has(lesson.id) ? <CircleCheck className="w-6 h-6 text-emerald-600" /> : <div className="w-4" />}{lesson.title}
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ))
+                                )}
                             </div>
 
                         </div>

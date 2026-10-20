@@ -4,7 +4,7 @@ import { LessonList } from "../features/lessons/components/LessonList";
 import { CourseHeader } from "../features/courses/components/CourseHeader";
 import { useCourse } from "../features/courses/hooks/useCourse";
 import { CourseProgress } from "../features/courses/components/CourseProgress";
-import { House } from "lucide-react";
+import { AlertCircle, House, Loader2 } from "lucide-react";
 import { useMyEnroll } from "../features/enrollments/hooks/useMyEnroll";
 import { useEnrollCourse } from "../features/enrollments/hooks/useEnrollCourse";
 import { useAuth } from "../features/auth/hooks/useAuth";
@@ -15,8 +15,8 @@ export const CoursePage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth()
-    const { data, isLoading, isError } = useCourse(id);
-    const { data: enrollment, isLoading: enrollmentIsLoading, isError: enrollmentIsError } = useMyEnroll();
+    const { data, isLoading, isError, refetch } = useCourse(id);
+    const { data: enrollment, isLoading: enrollmentIsLoading, isError: enrollmentIsError, refetch: refetchEnroll } = useMyEnroll();
     const isEnrolled = data
         ? (enrollment?.courses ?? []).some((enroll) => {
             return enroll.id === data.id
@@ -25,40 +25,30 @@ export const CoursePage = () => {
     const { data: progress, isLoading: progressIsLoading, isError: progressIsError } = useCourseProgress(id, isEnrolled);
     const mutation = useEnrollCourse()
 
-    if (isLoading) {
+    if (isLoading || enrollmentIsLoading || progressIsLoading) {
         return (
-            <h2>Загрузка курса...</h2>
-        )
+            <div className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen flex items-center justify-center gap-2">
+                <Loader2 className="animate-spin text-indigo-600" size={24} />
+                <span className="text-slate-600 font-medium">Загрузка курса...</span>
+            </div>
+        );
     }
-    if (enrollmentIsLoading) {
+
+    if (isError || enrollmentIsError || progressIsError || !data) {
         return (
-            <h2>Проверка записи на курс...</h2>
-        )
-    }
-    if (progressIsLoading) {
-        return (
-            <h2>Загрузка прогресса...</h2>
-        )
-    }
-    if (isError) {
-        return (
-            <h2>Не удалось загрузить курс</h2>
-        )
-    }
-    if (progressIsError) {
-        return (
-            <h2>Не удалось загрузить прогресс</h2>
-        )
-    }
-    if (enrollmentIsError) {
-        return (
-            <h2>Не удалось проверить запись на курс</h2>
-        )
-    }
-    if (!data) {
-        return (
-            <h2>Курс не найден</h2>
-        )
+            <div className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen flex flex-col items-center justify-center gap-3">
+                <p className="text-slate-700 font-medium">Не удалось загрузить данные курса</p>
+                <button
+                    onClick={() => {
+                        refetch();
+                        refetchEnroll();
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition-colors shadow-sm"
+                >
+                    Попробовать снова <AlertCircle className="text-red-300" size={18} />
+                </button>
+            </div>
+        );
     }
     const lessons = data.modules.flatMap((module) => {
         return module.lessons

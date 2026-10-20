@@ -1,4 +1,4 @@
-import { Search, X } from "lucide-react";
+import { AlertCircle, Loader2, Search, X } from "lucide-react";
 import { useCourses } from "../features/courses/hooks/useCourses";
 import { type ChangeEvent } from "react";
 import { CourseCard } from "../shared/components/CourseCard";
@@ -6,29 +6,30 @@ import { useCourseFilter } from "../features/courses/hooks/useCourseFilter";
 import { pluralize } from "../shared/utils/pluralize";
 
 export const CoursesPage = () => {
-    const { data, isLoading, isError } = useCourses();
+    const { data, isLoading, isError, refetch } = useCourses();
     const { filteredCourses, categoryArray, selectedCategory, setSelectedCategory, searchQuery, setSearchQuery } = useCourseFilter(data);
-
 
     if (isLoading) {
         return (
-            <h2>Загрузка курсов...</h2>
-        )
+            <div className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen flex items-center justify-center gap-2">
+                <Loader2 className="animate-spin text-indigo-600" size={24} />
+                <span className="text-slate-600 font-medium">Загрузка каталога курсов...</span>
+            </div>
+        );
     }
-    if (isError) {
+
+    if (isError || !data) {
         return (
-            <h2>Не удалось загрузить курсы</h2>
-        )
-    }
-    if (!data) {
-        return (
-            <h2>Курсов нет</h2>
-        )
-    }
-    if (data.length === 0) {
-        return (
-            <h2>Курсов пока нет</h2>
-        )
+            <div className="bg-[radial-gradient(circle_at_center,_#dbe4ff_0%,_#eef2ff_45%,_#f8fafc_100%)] min-h-screen flex flex-col items-center justify-center gap-3">
+                <p className="text-slate-700 font-medium">Не удалось загрузить каталог курсов</p>
+                <button
+                    onClick={() => refetch()}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-medium transition-colors shadow-sm"
+                >
+                    Попробовать снова <AlertCircle className="text-red-300" size={18} />
+                </button>
+            </div>
+        );
     }
 
     const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {

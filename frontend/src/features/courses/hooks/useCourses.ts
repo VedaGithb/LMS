@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import {getCourses, type GetCoursesParams} from "../api/course.api";
 
 export const useCourses = (params: GetCoursesParams = { sort: "newest", limit: 50 }) => {
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['courses', params],
         queryFn: () => getCourses(params),
     });
 
-    return { data, isLoading, isError, error };
+    return { data, isLoading, isError, error, refetch };
 }

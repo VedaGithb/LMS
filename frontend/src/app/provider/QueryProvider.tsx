@@ -5,7 +5,15 @@ import {
 
 import type { ReactNode } from "react";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 2 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            retry: 1,
+        },
+    },
+});
 
 export function QueryProvider({ children }: {
     children: ReactNode;
